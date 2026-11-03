@@ -58,7 +58,8 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .qlead{font-size:1.05rem;margin-bottom:1.25rem}
 .choice{display:block;width:100%;text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;margin-bottom:.75rem;color:var(--ink);font-size:1.05rem;line-height:1.55;transition:border-color .15s,background .15s}
 .choice b{display:inline-block;width:1.6rem;color:var(--accent);font-family:"Noto Serif KR",serif}
-.choice:hover{border-color:var(--accent)}
+@media (hover:hover){.choice:hover{border-color:var(--accent)}}
+.choice{-webkit-tap-highlight-color:transparent}
 .choice.picked{border-color:var(--accent);background:var(--accent-soft)}
 .nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem}
 .linkbtn{background:none;color:var(--ink-2);padding:.5rem .25rem;text-decoration:underline;text-underline-offset:3px}
@@ -222,11 +223,11 @@ const Q = [
  [['AC','상대가 강하게 원하면 내 뜻을 접어준다.'],['CO','상대가 강하게 원해도 내 뜻을 쉽게 접지 않는다.']],
  [['CO','누가 맞는지를 가려서 결론을 낸다.'],['AC','누가 맞는지보다 상대가 편해지는 쪽으로 결론을 낸다.']],
  // CL vs CP
- [['CP','빨리 절충안을 내서 마무리하는 편이다.'],['CL','근본 원인까지 다뤄서 다시 생기지 않게 하는 편이다.']],
+ [['CL','근본 원인까지 다뤄서 다시 생기지 않게 하는 편이다.'],['CP','빨리 절충안을 내서 마무리하는 편이다.']],
  [['CL','서로의 걱정을 솔직하게 터놓는 자리를 먼저 만든다.'],['CP','각자 요구를 반쯤 줄여서 바로 합의점을 찾는다.']],
  [['CP','완벽하지 않아도 양쪽이 수긍할 만한 선에서 끝낸다.'],['CL','양쪽 모두 완전히 만족하는 답이 있을 거라 믿고 찾아본다.']],
  // CL vs AV
- [['AV','갈등은 시간이 지나면 저절로 잦아든다고 보고 기다린다.'],['CL','갈등은 직접 마주 앉아 풀어야 한다고 보고 대화를 청한다.']],
+ [['CL','갈등은 직접 마주 앉아 풀어야 한다고 보고 대화를 청한다.'],['AV','갈등은 시간이 지나면 저절로 잦아든다고 보고 기다린다.']],
  [['CL','불편하더라도 서로의 진짜 관심사가 무엇인지 끝까지 확인한다.'],['AV','불편한 이야기는 가능한 한 미룬다.']],
  [['AV','의견 차이가 드러나면 그냥 각자 알아서 하자고 한다.'],['CL','의견 차이가 드러나면 둘의 생각을 합칠 방법을 함께 찾는다.']],
  // CL vs AC
@@ -265,7 +266,7 @@ function render(){
   $('next').disabled=ans[cur]===null;
   $('next').textContent=cur===Q.length-1?'결과 보기':'다음';
 }
-function pick(i){ans[cur]=i;render();setTimeout(()=>go(1),180);}
+function pick(i){ans[cur]=i;render();document.activeElement&&document.activeElement.blur();setTimeout(()=>go(1),180);}
 function go(d){
   if(d>0 && ans[cur]===null) return;
   if(d>0 && cur===Q.length-1){result();return;}
