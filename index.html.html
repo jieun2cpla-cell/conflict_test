@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>갈등 대응 유형 간이 검사</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F5F2; --paper:#FFFFFF; --ink:#1C2430; --ink-2:#55606D; --line:#D6DBD4;
+  --accent:#1E6E5C; --accent-soft:#DDEDE6; --accent-ink:#0F3F34;
+  --bar:#1E6E5C; --bar-dim:#B9CBC3;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#141A1C; --paper:#1D2529; --ink:#E7ECEA; --ink-2:#9FABA7; --line:#2E3A3E;
+    --accent:#5FB89F; --accent-soft:#1F3A33; --accent-ink:#BFE6D8;
+    --bar:#5FB89F; --bar-dim:#36514A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#141A1C; --paper:#1D2529; --ink:#E7ECEA; --ink-2:#9FABA7; --line:#2E3A3E;
+  --accent:#5FB89F; --accent-soft:#1F3A33; --accent-ink:#BFE6D8;
+  --bar:#5FB89F; --bar-dim:#36514A;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Noto Serif KR","Apple SD Gothic Neo",serif;font-weight:600;line-height:1.3;margin:0}
+main{max-width:640px;margin:0 auto;padding:2.5rem 1.25rem 4rem}
+.screen{display:none}.screen.on{display:block}
+p{margin:0 0 1rem}
+.muted{color:var(--ink-2);font-size:.95rem}
+button{font:inherit;cursor:pointer;border:0;border-radius:10px}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{background:var(--accent);color:#fff;padding:.9rem 1.5rem;font-weight:700;font-size:1.05rem}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--accent);border:1.5px solid var(--accent)}
+.btn:disabled{opacity:.4;cursor:default}
+
+/* intro */
+.intro h1{font-size:2rem;margin-bottom:1rem}
+.intro .axes{margin:1.5rem 0;padding:1.25rem;background:var(--paper);border:1px solid var(--line);border-radius:14px}
+.intro .axes svg{width:100%;max-width:360px;height:auto;display:block;margin:0 auto}
+.modes-list{display:grid;grid-template-columns:1fr 1fr;gap:.5rem .9rem;margin:1rem 0 1.5rem;padding:0;list-style:none;font-size:.95rem}
+.modes-list li span{color:var(--ink-2)}
+
+/* question */
+.progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:1.25rem}
+.progress i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.qnum{color:var(--ink-2);font-size:.9rem;margin-bottom:.4rem}
+.qlead{font-size:1.05rem;margin-bottom:1.25rem}
+.choice{display:block;width:100%;text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:1.1rem 1.2rem;margin-bottom:.75rem;color:var(--ink);font-size:1.05rem;line-height:1.55;transition:border-color .15s,background .15s}
+.choice b{display:inline-block;width:1.6rem;color:var(--accent);font-family:"Noto Serif KR",serif}
+.choice:hover{border-color:var(--accent)}
+.choice.picked{border-color:var(--accent);background:var(--accent-soft)}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem}
+.linkbtn{background:none;color:var(--ink-2);padding:.5rem .25rem;text-decoration:underline;text-underline-offset:3px}
+
+/* result */
+.result h1{font-size:1.7rem;margin-bottom:.4rem}
+.primary{margin:1.25rem 0 1.5rem;padding:1.25rem 1.4rem;background:var(--accent-soft);color:var(--accent-ink);border-radius:14px}
+.primary strong{font-size:1.35rem;font-family:"Noto Serif KR",serif;display:block;margin-bottom:.25rem}
+.chart{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:1.25rem 1.25rem .75rem;margin-bottom:1.5rem}
+.row{display:grid;grid-template-columns:5.2rem 1fr 2.6rem;align-items:center;gap:.75rem;margin-bottom:.8rem}
+.row .lab{font-weight:500}
+.row .track{height:14px;background:var(--bar-dim);border-radius:7px;overflow:hidden}
+.row .track i{display:block;height:100%;background:var(--bar);width:0;transition:width .6s ease}
+.row .score{text-align:right;font-variant-numeric:tabular-nums}
+.row .band{grid-column:1/-1;margin-top:-.5rem;font-size:.85rem;color:var(--ink-2)}
+.legend{font-size:.85rem;color:var(--ink-2);margin:.5rem 0 0;padding-top:.6rem;border-top:1px dashed var(--line)}
+details{background:var(--paper);border:1px solid var(--line);border-radius:14px;margin-bottom:.6rem;padding:0 1.2rem}
+summary{cursor:pointer;padding:.9rem 0;font-weight:700;list-style:none;display:flex;justify-content:space-between;align-items:center}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--accent);font-size:1.3rem;font-weight:400}
+details[open] summary::after{content:"–"}
+details .body{padding:0 0 1rem;font-size:.95rem}
+details .body h4{margin:.6rem 0 .2rem;font-size:.9rem;color:var(--accent)}
+details .body p{margin:0 0 .3rem}
+.primary .axis{font-size:.9rem;opacity:.85;margin-bottom:.6rem}
+.primary p{margin:.4rem 0 0}
+.when{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:1.1rem 1.3rem 1rem;margin-bottom:1.5rem}
+.when h3{font-size:1.1rem;margin-bottom:.6rem}
+.when ul{margin:0;padding-left:1.1rem}
+.when li{margin-bottom:.35rem}
+.when li::marker{color:var(--accent)}
+.sub{font-size:1.05rem;margin:1.75rem 0 .6rem}
+.actions{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.5rem}
+.note{font-size:.85rem;color:var(--ink-2);margin-top:2rem;border-top:1px solid var(--line);padding-top:1rem}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+
+<!-- ───────── 시작 화면 ───────── -->
+<section class="screen intro on" id="s-intro">
+  <h1>갈등 대응 유형<br>간이 검사</h1>
+  <p>의견이 부딪힐 때 당신은 주로 어떻게 움직이나요? 서로 다른 두 가지 행동 중 <strong>더 나다운 쪽</strong>을 고르는 문항 30개입니다. 정답은 없고, 5분이면 끝납니다.</p>
+
+  <div class="axes">
+    <svg viewBox="0 0 360 300" role="img" aria-label="자기주장과 협조 두 축 위의 다섯 가지 갈등 대응 유형">
+      <defs><style>.t{font-family:"Noto Sans KR",sans-serif;font-size:13px;fill:var(--ink)} .a{font-size:11px;fill:var(--ink-2)} .d{fill:var(--accent)}</style></defs>
+      <line x1="60" y1="260" x2="60" y2="30" stroke="var(--line)" stroke-width="1.5"/>
+      <line x1="60" y1="260" x2="340" y2="260" stroke="var(--line)" stroke-width="1.5"/>
+      <text x="22" y="150" class="t a" transform="rotate(-90 22 150)" text-anchor="middle">자기주장 ↑</text>
+      <text x="200" y="288" class="t a" text-anchor="middle">협조 →</text>
+      <circle cx="95" cy="60" r="6" class="d"/><text x="95" y="48" class="t" text-anchor="middle">경쟁</text>
+      <circle cx="305" cy="60" r="6" class="d"/><text x="305" y="48" class="t" text-anchor="middle">협력</text>
+      <circle cx="200" cy="150" r="6" class="d"/><text x="200" y="138" class="t" text-anchor="middle">타협</text>
+      <circle cx="95" cy="235" r="6" class="d"/><text x="95" y="223" class="t" text-anchor="middle">회피</text>
+      <circle cx="305" cy="235" r="6" class="d"/><text x="305" y="223" class="t" text-anchor="middle">수용</text>
+    </svg>
+  </div>
+
+  <ul class="modes-list">
+    <li>경쟁 <span>내 뜻을 관철한다</span></li>
+    <li>협력 <span>둘 다 만족할 답을 찾는다</span></li>
+    <li>타협 <span>서로 조금씩 양보한다</span></li>
+    <li>회피 <span>부딪히지 않고 넘어간다</span></li>
+    <li>수용 <span>상대의 뜻을 따른다</span></li>
+  </ul>
+
+  <button class="btn" onclick="start()">검사 시작</button>
+  <p class="muted" style="margin-top:1.25rem">실제 직장·가정 등에서 겪는 갈등 장면을 떠올리며, 바람직한 모습이 아니라 <em>실제로 자주 하는</em> 행동을 고르세요.</p>
+</section>
+
+<!-- ───────── 문항 화면 ───────── -->
+<section class="screen" id="s-q">
+  <div class="progress"><i id="bar"></i></div>
+  <div class="qnum" id="qnum"></div>
+  <p class="qlead" id="qlead"></p>
+  <button class="choice" id="cA" onclick="pick(0)"></button>
+  <button class="choice" id="cB" onclick="pick(1)"></button>
+  <div class="nav">
+    <button class="linkbtn" id="prev" onclick="go(-1)">이전 문항</button>
+    <button class="btn" id="next" onclick="go(1)" disabled>다음</button>
+  </div>
+</section>
+
+<!-- ───────── 결과 화면 ───────── -->
+<section class="screen result" id="s-r">
+  <h1>검사 결과</h1>
+  <p class="muted">다섯 유형의 점수 합은 항상 30입니다. 어느 한 유형이 '좋다'는 뜻이 아니라, 갈등 상황에서 당신이 어떤 도구를 자주 꺼내 쓰는지를 보여줍니다.</p>
+  <div class="primary" id="primary"></div>
+  <div class="when" id="when"></div>
+  <h3 class="sub">다섯 유형 점수</h3>
+  <div class="chart" id="chart"></div>
+  <h3 class="sub">다른 유형도 살펴보기</h3>
+  <div id="details"></div>
+  <div class="actions">
+    <button class="btn ghost" onclick="restart()">다시 하기</button>
+  </div>
+  <p class="note">이 검사는 Thomas–Kilmann 갈등 대응 모형(자기주장·협조 두 축, 다섯 가지 모드)의 구조를 따라 만든 <strong>비공식 자기성찰용 간이 검사</strong>입니다. 문항은 공식 TKI 검사지와 다르며, 점수 구간은 통계적 규준이 아닌 참고 기준입니다. 공식 검사와 해석은 인증된 기관을 통해 받으실 수 있습니다.</p>
+</section>
+
+</main>
+
+<script>
+// 유형 코드: CO 경쟁, CL 협력, CP 타협, AV 회피, AC 수용
+const MODES = {
+  CO:{name:'경쟁', en:'Competing', axis:'자기주장 높음 · 협조 낮음',
+      summary:'자신의 입장을 분명히 밝히고, 필요하면 힘과 논리를 써서 관철하는 방식입니다. 결단이 빠르고 책임을 피하지 않지만, 상대의 관심사는 뒤로 밀리기 쉽습니다.',
+      when:['긴급한 상황처럼 빠르고 단호한 행동이 필요할 때','반대가 많아도 반드시 시행해야 하는 중요한 사안일 때 (비용 절감, 모두가 꺼리는 규칙의 집행 등)','조직의 명운이 걸린 문제에서 내 판단이 옳다고 확신할 때','상대가 나의 양보를 이용하려 할 때 스스로를 지켜야 하는 경우'],
+      desc:'내 입장을 분명히 하고 관철하려 한다',
+      good:'빠른 결정이 필요할 때, 원칙을 지켜야 할 때, 인기 없는 결정을 책임지고 내려야 할 때.',
+      over:'주변 사람들이 이의를 제기하길 꺼리게 되고, 당신이 틀렸을 때 아무도 알려주지 않을 수 있습니다.',
+      under:'중요한 순간에 발언권을 잃고, 지켜야 할 것을 지키지 못한다고 느낄 수 있습니다.'},
+  CL:{name:'협력', en:'Collaborating', axis:'자기주장 높음 · 협조 높음',
+      summary:'내 관심사도, 상대의 관심사도 포기하지 않고 둘 다 충족하는 답을 함께 찾아가는 방식입니다. 시간과 에너지가 많이 들지만, 가장 깊고 오래가는 해결에 이릅니다.',
+      when:['양쪽 모두에게 너무 중요해 타협으로는 부족하고 통합적인 해법이 필요할 때','문제를 풀어가는 과정에서 무언가 배우려는 목적이 있을 때','관점이 다른 여러 사람의 아이디어를 하나로 엮어야 할 때','상대의 관심사를 합의에 담아 참여와 헌신을 이끌어내고 싶을 때','관계를 방해해 온 감정을 정리하고 함께 일하고자 할 때'],
+      desc:'서로의 속사정을 드러내고 둘 다 만족할 답을 찾는다',
+      good:'양쪽의 관심사가 모두 중요할 때, 관계와 결과를 함께 지켜야 할 때, 서로의 통찰을 합쳐야 할 때.',
+      over:'사소한 문제까지 긴 대화로 끌고 가 시간과 에너지를 소모할 수 있습니다.',
+      under:'표면적 해결에 그쳐 같은 갈등이 반복되고, 상대의 진짜 관심사를 놓치기 쉽습니다.'},
+  CP:{name:'타협', en:'Compromising', axis:'자기주장 중간 · 협조 중간',
+      summary:'서로 조금씩 양보해 양쪽이 받아들일 수 있는 중간 지점을 찾는 방식입니다. 빠르고 현실적이지만, 어느 쪽도 완전히 만족하지는 못합니다.',
+      when:['목표가 중요하긴 하지만 더 강하게 밀어붙일 만큼은 아닐 때','힘이 비슷한 양쪽이 서로 다른 목표를 가지고 맞설 때','복잡한 문제에 대해 임시 해결책이 필요할 때','시간이 촉박해 우선 실용적인 방안을 마련해야 할 때','협력이나 경쟁이 통하지 않았을 때의 대안이 필요할 때'],
+      desc:'각자 조금씩 양보해 중간 지점에서 합의한다',
+      good:'시간이 촉박할 때, 양쪽 힘이 비슷할 때, 임시 해결이 필요할 때.',
+      over:'원칙까지 흥정 대상이 되고, 큰 그림을 보기보다 "반반"에 안주할 수 있습니다.',
+      under:'사소한 일에도 유연하게 물러서지 못해 협상이 자주 막힐 수 있습니다.'},
+  AV:{name:'회피', en:'Avoiding', axis:'자기주장 낮음 · 협조 낮음',
+      summary:'당장은 갈등을 꺼내지 않고 거리를 두거나 미루는 방식입니다. 불필요한 충돌을 막고 시간을 벌어 주지만, 문제 자체가 해결되지는 않습니다.',
+      when:['사안이 사소하거나, 더 급하고 중요한 일이 쌓여 있을 때','내 관심사를 관철할 가능성이 거의 없을 때','문제를 해결해서 얻는 이득보다 부딪혀서 생기는 손실이 더 클 때','사람들이 흥분을 가라앉히고 문제를 제대로 볼 시간이 필요할 때','결정을 내리기 전에 정보를 더 모아야 할 때','다른 사람이 이 갈등을 더 잘 풀 수 있을 때','그 문제가 사실은 다른 근본 문제의 증상에 불과할 때'],
+      desc:'당장은 문제를 꺼내지 않고 거리를 둔다',
+      good:'사안이 사소할 때, 감정이 격해 식힐 시간이 필요할 때, 정보가 더 필요할 때.',
+      over:'결정이 계속 미뤄지고, 말하지 못한 불만이 쌓여 관계가 서서히 식을 수 있습니다.',
+      under:'모든 일에 부딪혀 피로해지고, 우선순위 없이 싸움을 고를 수 있습니다.'},
+  AC:{name:'수용', en:'Accommodating', axis:'자기주장 낮음 · 협조 높음',
+      summary:'내 관심사를 접고 상대의 뜻을 따라 주는 방식입니다. 관계와 조화를 지키고 신뢰를 쌓지만, 내 필요가 계속 뒤로 밀리면 억울함이 쌓일 수 있습니다.',
+      when:['내가 틀렸음을 알게 되었을 때 (더 나은 의견을 듣고 배우며, 합리적인 사람임을 보이기 위해)','상대에게 훨씬 더 중요한 사안일 때 (상대를 만족시키고 우호적인 관계를 맺기 위해)','앞으로의 더 중요한 일을 위해 신뢰와 관계를 쌓아야 할 때','어차피 지는 상황에서 손실을 최소화하려 할 때','조화와 안정이 특히 중요한 시기일 때','후배가 시행착오를 통해 배우고 성장하도록 맡겨야 할 때'],
+      desc:'관계를 위해 내 요구를 접고 상대의 뜻을 따른다',
+      good:'내가 틀렸음을 깨달았을 때, 상대에게 훨씬 중요한 일일 때, 관계 유지가 결과보다 중요할 때.',
+      over:'내 필요가 계속 뒤로 밀려 영향력이 줄고, 속으로 억울함이 쌓일 수 있습니다.',
+      under:'선의를 베풀거나 예외를 인정하기 어려워 융통성 없는 사람으로 보일 수 있습니다.'}
+};
+const ORDER = ['CO','CL','CP','AV','AC'];
+
+// 30문항: 10가지 유형 쌍 × 3회, 각 유형은 12번 등장. 모두 자체 작성 문항.
+const Q = [
+ // CO vs CL
+ [['CO','상대가 내 의견에 반대하면, 내 근거를 더 강하게 밀어붙인다.'],['CL','상대가 왜 반대하는지 먼저 자세히 묻고 함께 풀 방법을 찾는다.']],
+ [['CL','시간이 걸리더라도 양쪽 관심사를 다 담는 새로운 방안을 만들어 보려 한다.'],['CO','내가 옳다고 확신하면 상대가 받아들이도록 설득하는 데 집중한다.']],
+ [['CO','결정이 늦어지면 내가 주도권을 잡고 방향을 정한다.'],['CL','결정이 늦어져도 모두가 납득할 때까지 논의를 이어간다.']],
+ // CO vs CP
+ [['CP','서로 양보할 수 있는 부분을 찾아 적당한 선에서 합의한다.'],['CO','내가 원하는 것을 끝까지 요구한다.']],
+ [['CO','협상에서는 내 쪽에 유리한 결과를 얻는 것이 중요하다.'],['CP','협상에서는 양쪽이 비슷하게 얻고 잃는 것이 중요하다.']],
+ [['CP','"이 정도면 서로 괜찮지 않나"라며 중간안을 제안한다.'],['CO','"이건 양보할 수 없다"고 분명히 선을 긋는다.']],
+ // CO vs AV
+ [['AV','민감한 주제는 굳이 꺼내지 않고 넘어간다.'],['CO','민감한 주제라도 내 입장은 확실히 말한다.']],
+ [['CO','논쟁이 벌어지면 끝까지 내 주장을 지킨다.'],['AV','논쟁이 벌어질 것 같으면 자리를 피하거나 화제를 돌린다.']],
+ [['AV','상대와 의견이 다르다는 걸 알아도 일단 두고 본다.'],['CO','상대와 의견이 다르면 바로 바로잡으려 한다.']],
+ // CO vs AC
+ [['CO','내 목표를 이루는 것이 상대의 기분보다 우선이다.'],['AC','상대의 기분을 지키는 것이 내 목표보다 우선이다.']],
+ [['AC','상대가 강하게 원하면 내 뜻을 접어준다.'],['CO','상대가 강하게 원해도 내 뜻을 쉽게 접지 않는다.']],
+ [['CO','누가 맞는지를 가려서 결론을 낸다.'],['AC','누가 맞는지보다 상대가 편해지는 쪽으로 결론을 낸다.']],
+ // CL vs CP
+ [['CP','빨리 절충안을 내서 마무리하는 편이다.'],['CL','근본 원인까지 다뤄서 다시 생기지 않게 하는 편이다.']],
+ [['CL','서로의 걱정을 솔직하게 터놓는 자리를 먼저 만든다.'],['CP','각자 요구를 반쯤 줄여서 바로 합의점을 찾는다.']],
+ [['CP','완벽하지 않아도 양쪽이 수긍할 만한 선에서 끝낸다.'],['CL','양쪽 모두 완전히 만족하는 답이 있을 거라 믿고 찾아본다.']],
+ // CL vs AV
+ [['AV','갈등은 시간이 지나면 저절로 잦아든다고 보고 기다린다.'],['CL','갈등은 직접 마주 앉아 풀어야 한다고 보고 대화를 청한다.']],
+ [['CL','불편하더라도 서로의 진짜 관심사가 무엇인지 끝까지 확인한다.'],['AV','불편한 이야기는 가능한 한 미룬다.']],
+ [['AV','의견 차이가 드러나면 그냥 각자 알아서 하자고 한다.'],['CL','의견 차이가 드러나면 둘의 생각을 합칠 방법을 함께 찾는다.']],
+ // CL vs AC
+ [['AC','상대가 원하는 대로 해주는 것이 결국 가장 편하다.'],['CL','내가 원하는 것과 상대가 원하는 것을 둘 다 이야기해야 한다.']],
+ [['CL','내 요구를 숨기지 않고 꺼내 놓고 같이 조정한다.'],['AC','내 요구는 접어두고 상대가 바라는 쪽으로 맞춘다.']],
+ [['AC','상대의 입장을 들어주고 나는 양보한다.'],['CL','상대의 입장을 들은 뒤 내 입장도 똑같이 설명한다.']],
+ // CP vs AV
+ [['CP','문제가 생기면 바로 "그럼 이렇게 하자"며 중간안을 낸다.'],['AV','문제가 생기면 일단 시간을 두고 지켜본다.']],
+ [['AV','사소한 갈등은 그냥 넘긴다.'],['CP','사소한 갈등도 서로 조금씩 양보해 바로 정리한다.']],
+ [['CP','합의가 안 되면 반씩 나누자고 제안한다.'],['AV','합의가 안 되면 다음 기회로 미룬다.']],
+ // CP vs AC
+ [['AC','상대에게 더 중요한 일이라면 내가 다 양보한다.'],['CP','상대에게 더 중요한 일이라도 나도 얻는 게 있어야 한다.']],
+ [['CP','서로 한 발씩 물러서는 것이 공평하다.'],['AC','내가 한 발 더 물러서는 것이 관계에 좋다.']],
+ [['AC','상대를 섭섭하게 하느니 내가 손해 보는 편을 택한다.'],['CP','섭섭함이 남더라도 양쪽이 비슷하게 손해 보는 편을 택한다.']],
+ // AV vs AC
+ [['AV','상대와 마찰이 생길 것 같으면 아예 말을 꺼내지 않는다.'],['AC','상대와 마찰이 생길 것 같으면 상대 뜻대로 하겠다고 말한다.']],
+ [['AC','상대가 화를 내면 내가 먼저 맞춰준다.'],['AV','상대가 화를 내면 그 자리를 벗어난다.']],
+ [['AV','의견 차이는 모른 척 지나가는 편이다.'],['AC','의견 차이가 있으면 상대의 의견을 따르는 편이다.']]
+];
+
+let cur = 0, ans = Array(Q.length).fill(null);
+const $ = id => document.getElementById(id);
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');window.scrollTo({top:0});}
+function start(){cur=0;ans.fill(null);show('s-q');render();}
+function restart(){start();}
+function render(){
+  const q=Q[cur];
+  $('bar').style.width=((cur)/Q.length*100)+'%';
+  $('qnum').textContent=(cur+1)+' / '+Q.length;
+  $('qlead').textContent='둘 중 더 나다운 쪽은?';
+  $('cA').innerHTML='<b>A</b>'+q[0][1];
+  $('cB').innerHTML='<b>B</b>'+q[1][1];
+  $('cA').classList.toggle('picked',ans[cur]===0);
+  $('cB').classList.toggle('picked',ans[cur]===1);
+  $('prev').style.visibility=cur===0?'hidden':'visible';
+  $('next').disabled=ans[cur]===null;
+  $('next').textContent=cur===Q.length-1?'결과 보기':'다음';
+}
+function pick(i){ans[cur]=i;render();setTimeout(()=>go(1),180);}
+function go(d){
+  if(d>0 && ans[cur]===null) return;
+  if(d>0 && cur===Q.length-1){result();return;}
+  cur=Math.max(0,Math.min(Q.length-1,cur+d));render();
+}
+function band(n){return n>=8?'자주 씀':n>=4?'보통':'드묾';}
+function result(){
+  const s={CO:0,CL:0,CP:0,AV:0,AC:0};
+  Q.forEach((q,i)=>{s[q[ans[i]][0]]++;});
+  // 동점이면 두 유형이 직접 맞붙은 3문항에서 더 많이 선택된 쪽을 우선
+  const h2h=(a,b)=>{let w=0;Q.forEach((q,i)=>{const m=[q[0][0],q[1][0]];if(m.includes(a)&&m.includes(b)){w+=q[ans[i]][0]===a?1:-1;}});return w;};
+  const sorted=[...ORDER].sort((a,b)=>(s[b]-s[a])||h2h(b,a));
+  const top=sorted[0], second=sorted[1], low=sorted[4];
+  const m=MODES[top];
+  $('primary').innerHTML='<strong>'+m.name+' · '+m.en+'</strong><div class="axis">'+m.axis+'</div><p>'+m.summary+'</p>'
+    +'<p class="muted" style="margin-top:.8rem">두 번째로 자주 쓰는 방식은 <b>'+MODES[second].name+'</b>, 가장 적게 쓰는 방식은 <b>'+MODES[low].name+'</b>입니다.</p>';
+  $('when').innerHTML='<h3>'+m.name+' 방식이 효과적인 상황</h3><ul>'+m.when.map(t=>'<li>'+t+'</li>').join('')+'</ul>';
+  $('chart').innerHTML=ORDER.map(k=>'<div class="row"><span class="lab">'+MODES[k].name+'</span><span class="track"><i data-w="'+(s[k]/12*100)+'"></i></span><span class="score">'+s[k]+'</span><span class="band">'+band(s[k])+' · '+MODES[k].desc+'</span></div>').join('')
+    +'<p class="legend">각 유형 0~12점. 참고 구간: 0–3 드묾 · 4–7 보통 · 8–12 자주 씀</p>';
+  $('details').innerHTML=sorted.filter(k=>k!==top).map(k=>'<details><summary>'+MODES[k].name+' '+MODES[k].en+' <span class="muted">'+s[k]+'점</span></summary><div class="body"><p class="muted">'+MODES[k].axis+'</p><p>'+MODES[k].summary+'</p>'
+    +'<h4>효과적인 상황</h4><ul style="margin:0 0 .3rem;padding-left:1.1rem">'+MODES[k].when.map(t=>'<li>'+t+'</li>').join('')+'</ul>'
+    +'<h4>이럴 때 잘 통합니다</h4><p>'+MODES[k].good+'</p>'
+    +'<h4>너무 자주 쓰면</h4><p>'+MODES[k].over+'</p>'
+    +'<h4>너무 안 쓰면</h4><p>'+MODES[k].under+'</p></div></details>').join('');
+  show('s-r');
+  requestAnimationFrame(()=>document.querySelectorAll('.track i').forEach(b=>b.style.width=b.dataset.w+'%'));
+}
+</script>
+</body>
+</html>
